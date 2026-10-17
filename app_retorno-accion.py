@@ -70,7 +70,7 @@ if error or datos_crudos is None or datos_crudos.empty:
       f"Ocurrió un error al obtener los datos. Verifica los símbolos ingresados ({ticker_accion}, {ticker_mercado}). Detalle: {error}"
   )
 else:
-    ```python
+    python
   if ticker_accion == ticker_mercado:
     st.warning(
         f"⚠️ **Atención:** Has seleccionado el mismo símbolo (**{ticker_accion}**)"
