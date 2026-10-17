@@ -250,7 +250,7 @@ else:
           "La varianza anual del activo se obtiene escalando la varianza de"
           " los retornos diarios por el factor anual:"
       )
-      st.latex(r"\sigma^2_{anual} = \sigma^2_{diaria} \times \{252}")
+      st.latex(r"\sigma^2_{anual} = \sigma^2_{diaria} \times {252}")
 
       st.markdown("---")
       st.markdown(f"### 3. Desvío Estándar Anualizado ($\sigma$)")
