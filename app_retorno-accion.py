@@ -51,16 +51,15 @@ tasa_libre_riesgo = (
 def cargar_datos(acc, mkt, inicio, fin):
   try:
     tickers_a_descargar = list(set([acc, mkt]))
-datos = yf.download(
-    tickers_a_descargar, start=inicio, end=fin, progress=False
+    datos = yf.download(
+        tickers_a_descargar, start=inicio, end=fin, progress=False
 )["Close"]
-    if isinstance(datos, pd.Series):
-      return None, "No se pudieron descargar suficientes datos para los símbolos."
-    datos = datos.dropna()
-    return datos, None
-  except Exception as e:
+if isinstance(datos, pd.Series):
+    return None, "No se pudieron descargar suficientes datos para los símbolos."
+datos = datos.dropna()
+return datos, None
+except Exception as e:
     return None, str(e)
-
 
 # Ejecutar descarga
 datos_crudos, error = cargar_datos(
