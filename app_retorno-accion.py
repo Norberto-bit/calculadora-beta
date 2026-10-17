@@ -102,7 +102,7 @@ else:
         ret_esp_mercado_anual - tasa_libre_riesgo
     )
 
-    # --- VISUALIZACIÓN EN PANTALLA (RESUMEN EJECUTIVO CON FÓRMULAS CORREGIDAS) ---
+    # --- VISUALIZACIÓN EN PANTALLA (RESUMEN EJECUTIVO OPTIMIZADO) ---
     st.markdown("### 📈 Resumen Ejecutivo de Desempeño y Riesgo (Anualizado)")
     st.markdown(
         "*(Valores estandarizados a tasa anual con 252 ruedas bursátiles)*"
@@ -112,50 +112,53 @@ else:
 
     with kpi1:
       st.metric(
-          label=f"Retorno Esperado Anual ({ticker_accion})",
+          label=f"Ret. Esp. Anual ({ticker_accion})",
           value=f"{ret_esp_accion_anual:.2%}",
       )
       st.markdown(
-          r"<small style='color: grey;'>$E(R) = (1 + \bar{R}_{diaria})^{252} -"
-          r" 1$</small>",
+          r"<div style='font-size: 11px; color: grey; white-space:"
+          r" nowrap;'>$E(R)=(1+\bar{R}_{d})^{252}-1$</div>",
           unsafe_allow_html=True,
       )
 
     with kpi2:
       st.metric(
-          label=f"Retorno Esperado Anual ({ticker_mercado})",
+          label=f"Ret. Esp. Anual ({ticker_mercado})",
           value=f"{ret_esp_mercado_anual:.2%}",
       )
       st.markdown(
-          r"<small style='color: grey;'>$E(R_m) = (1 +" r" \bar{R}_{m,diaria})^{252} - 1$</small>",
+          r"<div style='font-size: 11px; color: grey; white-space:"
+          r" nowrap;'>$E(R_m)=(1+\bar{R}_{m,d})^{252}-1$</div>",
           unsafe_allow_html=True,
       )
 
     with kpi3:
       st.metric(
-          label=f"Varianza Anual σ² ({ticker_accion})",
+          label=f"Varianza σ² ({ticker_accion})",
           value=f"{var_accion_anual:.4f}",
       )
       st.markdown(
-          r"<small style='color: grey;'>$\sigma^2_{anual} = (\sigma_{diaria} \times" r" \sqrt{252})^2$</small>",
+          r"<div style='font-size: 11px; color: grey; white-space:"
+          r" nowrap;'>$\sigma^2_{anual}=(\sigma_{d}\sqrt{252})^2$</div>",
           unsafe_allow_html=True,
       )
 
     with kpi4:
       st.metric(
-          label=f"Desvío Estándar Anual σ ({ticker_accion})",
+          label=f"Desvío Anual σ ({ticker_accion})",
           value=f"{std_accion_anual:.2%}",
       )
       st.markdown(
-          r"<small style='color: grey;'>$\sigma_{anual} = \sigma_{diaria} \times"
-          r" \sqrt{252}$</small>",
+          r"<div style='font-size: 11px; color: grey; white-space:"
+          r" nowrap;'>$\sigma_{anual}=\sigma_{d}\sqrt{252}$</div>",
           unsafe_allow_html=True,
       )
 
     with kpi5:
-      st.metric(label="Coeficiente Beta (β)", value=f"{beta:.2f}")
+      st.metric(label="Beta (β)", value=f"{beta:.2f}")
       st.markdown(
-          r"<small style='color: grey;'>$\beta = \frac{Cov(R_a," r" R_m)}{Var(R_m)}$</small>",
+          r"<div style='font-size: 11px; color: grey; white-space:"
+          r" nowrap;'>$\beta=\frac{Cov(R_a,R_m)}{Var(R_m)}$</div>",
           unsafe_allow_html=True,
       )
 
