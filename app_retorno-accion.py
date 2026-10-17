@@ -239,7 +239,7 @@ else:
       st.markdown("---")
       st.markdown(f"### 1. Retorno Esperado Anualizado ({ticker_accion})")
       st.markdown(
-          "Se calcula componiendo el promedio geométrico/aritmético de los"
+          "Se calcula componiendo el promedio aritmético de los"
           " retornos diarios a lo largo de 252 ruedas de mercado anuales:"
       )
       st.latex(r"E(R) = (1 + \bar{R}_{diaria})^{252} - 1")
