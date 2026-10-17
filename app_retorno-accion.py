@@ -102,7 +102,7 @@ else:
         ret_esp_mercado_anual - tasa_libre_riesgo
     )
 
-    # --- VISUALIZACIÓN EN PANTALLA (RESUMEN EJECUTIVO OPTIMIZADO) ---
+    # --- VISUALIZACIÓN EN PANTALLA (RESUMEN EJECUTIVO LIMPIO) ---
     st.markdown("### 📈 Resumen Ejecutivo de Desempeño y Riesgo (Anualizado)")
     st.markdown(
         "*(Valores estandarizados a tasa anual con 252 ruedas bursátiles)*"
@@ -115,61 +115,33 @@ else:
           label=f"Ret. Esp. Anual ({ticker_accion})",
           value=f"{ret_esp_accion_anual:.2%}",
       )
-      st.markdown(
-          r"<div style='font-size: 11px; color: grey; white-space:"
-          r" nowrap;'>$E(R)=(1+\bar{R}_{d})^{252}-1$</div>",
-          unsafe_allow_html=True,
-      )
-
     with kpi2:
       st.metric(
           label=f"Ret. Esp. Anual ({ticker_mercado})",
           value=f"{ret_esp_mercado_anual:.2%}",
       )
-      st.markdown(
-          r"<div style='font-size: 11px; color: grey; white-space:"
-          r" nowrap;'>$E(R_m)=(1+\bar{R}_{m,d})^{252}-1$</div>",
-          unsafe_allow_html=True,
-      )
-
     with kpi3:
       st.metric(
           label=f"Varianza σ² ({ticker_accion})",
           value=f"{var_accion_anual:.4f}",
       )
-      st.markdown(
-          r"<div style='font-size: 11px; color: grey; white-space:"
-          r" nowrap;'>$\sigma^2_{anual}=(\sigma_{d}\sqrt{252})^2$</div>",
-          unsafe_allow_html=True,
-      )
-
     with kpi4:
       st.metric(
           label=f"Desvío Anual σ ({ticker_accion})",
           value=f"{std_accion_anual:.2%}",
       )
-      st.markdown(
-          r"<div style='font-size: 11px; color: grey; white-space:"
-          r" nowrap;'>$\sigma_{anual}=\sigma_{d}\sqrt{252}$</div>",
-          unsafe_allow_html=True,
-      )
-
     with kpi5:
       st.metric(label="Beta (β)", value=f"{beta:.2f}")
-      st.markdown(
-          r"<div style='font-size: 11px; color: grey; white-space:"
-          r" nowrap;'>$\beta=\frac{Cov(R_a,R_m)}{Var(R_m)}$</div>",
-          unsafe_allow_html=True,
-      )
 
     st.markdown("---")
 
     # --- PESTAÑAS DE ANÁLISIS ---
-    tab1, tab2, tab3, tab4 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
         "📊 Rentabilidad y Distribución Diaria",
         "📐 Análisis de Regresión y Beta",
         "📋 Datos Históricos",
-        "💰 Cálculo Detallado CAPM",
+        "🧮 Cálculos Detallados",
+        "💰 Costo de Capital (CAPM)",
     ])
 
     with tab1:
@@ -258,7 +230,49 @@ else:
       st.dataframe(df_display.tail(100), use_container_width=True)
 
     with tab4:
-      st.subheader("Determinación del Costo de Capital (Modelo CAPM)")
+      st.subheader("🧮 Memoria de Cálculo Detallada y Fórmulas")
+      st.markdown(
+          "A continuación se detallan las fórmulas matemáticas y conceptuales"
+          " utilizadas para el cálculo de cada métrica en la aplicación:"
+      )
+
+      st.markdown("---")
+      st.markdown(f"### 1. Retorno Esperado Anualizado ({ticker_accion})")
+      st.markdown(
+          "Se calcula componiendo el promedio geométrico/aritmético de los"
+          " retornos diarios a lo largo de 252 ruedas de mercado anuales:"
+      )
+      st.latex(r"E(R) = (1 + \bar{R}_{diaria})^{252} - 1")
+
+      st.markdown("---")
+      st.markdown(f"### 2. Varianza Anualizada ($\sigma^2$)")
+      st.markdown(
+          "La varianza anual del activo se obtiene escalando la varianza de"
+          " los retornos diarios por el factor anual:"
+      )
+      st.latex(r"\sigma^2_{anual} = (\sigma_{diaria} \times \sqrt{252})^2")
+
+      st.markdown("---")
+      st.markdown(f"### 3. Desvío Estándar Anualizado ($\sigma$)")
+      st.markdown(
+          "Representa la volatilidad anualizada del activo, calculada como el"
+          " desvío diario multiplicado por la raíz cuadrada de 252:"
+      )
+      st.latex(r"\sigma_{anual} = \sigma_{diaria} \times \sqrt{252}")
+
+      st.markdown("---")
+      st.markdown("### 4. Coeficiente Beta ($\beta$) del Activo")
+      st.markdown(
+          "Mide el riesgo sistemático o sensibilidad del activo frente al"
+          " mercado, calculado como la covarianza entre los retornos del activo"
+          " y el mercado dividida por la varianza de los retornos del mercado:"
+      )
+      st.latex(r"\beta = \frac{Cov(R_a, R_m)}{Var(R_m)}")
+
+    with tab5:
+      st.subheader(
+          "💰 Determinación del Costo de Capital (Modelo CAPM)"
+      )
       st.markdown(
           "El modelo de valoración de activos financieros (*Capital Asset"
           " Pricing Model*) calcula el costo de oportunidad del accionista en"
@@ -272,30 +286,30 @@ else:
 
       with col_c1:
         st.metric(
-            label="Tasa Libre de Riesgo (Rf)",
+            label="Tasa Libre de Riesgo ($R_f$)",
             value=f"{tasa_libre_riesgo:.2%}",
         )
         st.metric(
             label=(
-                "Retorno Esperado Anual del Mercado E(Rm)"
+                "Retorno Esperado Anual del Mercado $E(R_m)$"
                 f" ({ticker_mercado})"
             ),
             value=f"{ret_esp_mercado_anual:.2%}",
         )
         prima_mercado = ret_esp_mercado_anual - tasa_libre_riesgo
         st.metric(
-            label="Prima de Riesgo de Mercado [E(Rm) - Rf]",
+            label="Prima de Riesgo de Mercado $[E(R_m) - R_f]$",
             value=f"{prima_mercado:.2%}",
         )
 
       with col_c2:
-        st.metric(label=f"Coeficiente Beta (βi)", value=f"{beta:.2f}")
+        st.metric(label=f"Coeficiente Beta ($\beta_i$)", value=f"{beta:.2f}")
         prima_activo = beta * prima_mercado
         st.metric(
-            label=f"Prima por Riesgo del Activo (β × Prima)",
+            label=f"Prima por Riesgo del Activo ($\beta \\times$ Prima)",
             value=f"{prima_activo:.2%}",
         )
         st.metric(
-            label=f"Costo de Capital Final E(Ri) ({ticker_accion})",
+            label=f"Costo de Capital Final $E(R_i)$ ({ticker_accion})",
             value=f"{costo_capital_capm:.2%}",
         )
