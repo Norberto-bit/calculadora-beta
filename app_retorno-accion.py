@@ -45,7 +45,6 @@ tasa_libre_riesgo = (
     / 100
 )
 
-
 # Función para descargar y procesar datos de forma segura
 @st.cache_data
 def cargar_datos(acc, mkt, inicio, fin):
@@ -53,12 +52,12 @@ def cargar_datos(acc, mkt, inicio, fin):
     tickers_a_descargar = list(set([acc, mkt]))
     datos = yf.download(
         tickers_a_descargar, start=inicio, end=fin, progress=False
-)["Close"]
-if isinstance(datos, pd.Series):
-    return None, "No se pudieron descargar suficientes datos para los símbolos."
-datos = datos.dropna()
-return datos, None
-except Exception as e:
+    )["Close"]
+    if isinstance(datos, pd.Series):
+      return None, "No se pudieron descargar suficientes datos para los símbolos."
+    datos = datos.dropna()
+    return datos, None
+  except Exception as e:
     return None, str(e)
 
 # Ejecutar descarga
