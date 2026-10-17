@@ -16,7 +16,7 @@ st.set_page_config(
 # Estilo visual moderno y limpio
 st.title("📊 Análisis de Rentabilidad, Riesgo y Beta de Mercado")
 st.markdown(
-    "Herramienta académica y profesional para evaluar el rendimiento, riesgo y costo de capital de activos financieros."
+    "Herramienta académica y profesional para evaluar el rendimiento, riesgo y costo de capital con métricas anualizadas homogéneas."
 )
 
 # --- PANEL LATERAL (CONTROLES) ---
@@ -83,18 +83,15 @@ else:
     df["Ret_Mercado"] = df["Mercado"].pct_change()
     df = df.dropna()
 
-    # --- CÁLCULOS ESTADÍSTICOS Y FINANCIEROS ---
-    # 1. Rentabilidad Esperada Diaria y Anualizada (Media geométrica o aritmética aproximada)
-    ret_esp_accion_diaria = df["Ret_Accion"].mean()
-    ret_esp_mercado_diaria = df["Ret_Mercado"].mean()
+    # --- CÁLCULOS ESTADÍSTICOS Y FINANCIEROS (ANUALIZADOS Y HOMOGÉNEOS) ---
+    # 1. Retorno Esperado Anualizado
+    ret_esp_accion_anual = (1 + df["Ret_Accion"].mean()) ** 252 - 1
+    ret_esp_mercado_anual = (1 + df["Ret_Mercado"].mean()) ** 252 - 1
 
-    # Anualización (252 ruedas bursátiles)
-    ret_esp_accion_anual = (1 + ret_esp_accion_diaria) ** 252 - 1
-    ret_esp_mercado_anual = (1 + ret_esp_mercado_diaria) ** 252 - 1
-
-    # 2. Varianza y Desvío Estándar de la Acción
-    var_accion = df["Ret_Accion"].var()
-    std_accion = df["Ret_Accion"].std()
+    # 2. Desvío Estándar y Varianza ANUALIZADOS
+    std_accion_diario = df["Ret_Accion"].std()
+    std_accion_anual = std_accion_diario * np.sqrt(252)
+    var_accion_anual = std_accion_anual ** 2
 
     # 3. Cálculo de la Beta (Covarianza / Varianza del mercado)
     cov_mat = np.cov(df["Ret_Accion"], df["Ret_Mercado"])
@@ -105,32 +102,63 @@ else:
         ret_esp_mercado_anual - tasa_libre_riesgo
     )
 
-    # --- VISUALIZACIÓN EN PANTALLA (RESUMEN EJECUTIVO) ---
-    st.markdown("### 📈 Resumen Ejecutivo de Desempeño y Riesgo")
+    # --- VISUALIZACIÓN EN PANTALLA (RESUMEN EJECUTIVO CON FÓRMULAS) ---
+    st.markdown("### 📈 Resumen Ejecutivo de Desempeño y Riesgo (Anualizado)")
+    st.markdown(
+        "*(Valores estandarizados a tasa anual con 252 ruedas bursátiles)*"
+    )
+
     kpi1, kpi2, kpi3, kpi4, kpi5 = st.columns(5)
 
     with kpi1:
       st.metric(
-          label=f"Retorno Esperado ({ticker_accion})",
+          label=f"Retorno Esperado Anual ({ticker_accion})",
           value=f"{ret_esp_accion_anual:.2%}",
       )
+      st.markdown(
+          "<small style='color: grey;'>$E(R) = (1 + \bar{R}_{diaria})^{252} -"
+          " 1$</small>",
+          unsafe_allow_html=True,
+      )
+
     with kpi2:
       st.metric(
-          label=f"Retorno Esperado ({ticker_mercado})",
+          label=f"Retorno Esperado Anual ({ticker_mercado})",
           value=f"{ret_esp_mercado_anual:.2%}",
       )
+      st.markdown(
+          "<small style='color: grey;'>$E(R_m) = (1 +" " \bar{R}_{m,diaria})^{252} - 1$</small>",
+          unsafe_allow_html=True,
+      )
+
     with kpi3:
       st.metric(
-          label=f"Varianza $\\sigma^2$ ({ticker_accion})",
-          value=f"{var_accion:.6f}",
+          label=f"Varianza Anual $\\sigma^2$ ({ticker_accion})",
+          value=f"{var_accion_anual:.4f}",
       )
+      st.markdown(
+          "<small style='color: grey;'>$\sigma^2_{anual} = (\sigma_{diaria} \times" " \sqrt{252})^2$</small>",
+          unsafe_allow_html=True,
+      )
+
     with kpi4:
       st.metric(
-          label=f"Desvío Estándar $\\sigma$ ({ticker_accion})",
-          value=f"{std_accion:.4f}",
+          label=f"Desvío Estándar Anual $\\sigma$ ({ticker_accion})",
+          value=f"{std_accion_anual:.2%}",
       )
+      st.markdown(
+          "<small style='color: grey;'>$\sigma_{anual} = \sigma_{diaria} \times"
+          " \sqrt{252}$</small>",
+          unsafe_allow_html=True,
+      )
+
     with kpi5:
       st.metric(label="Coeficiente Beta ($\beta$)", value=f"{beta:.2f}")
+      st.markdown(
+          "<small style='color: grey;'>$\beta ="
+          " \frac{Cov(R_a, R_m)}{Var(R_m)}$</small>",
+          unsafe_allow_html=True,
+      )
 
     st.markdown("---")
 
@@ -183,11 +211,9 @@ else:
           "El coeficiente Beta ($\beta$) mide la sensibilidad de la acción respecto al mercado de referencia."
       )
 
-      # Cálculo de la regresión lineal: Y = m*X + b (Ret_Accion = Beta * Ret_Mercado + Alfa)
       m, b_int = np.polyfit(df["Ret_Mercado"], df["Ret_Accion"], 1)
       df["Tendencia_Regresion"] = m * df["Ret_Mercado"] + b_int
 
-      # Mostrar fórmula matemática estimada
       st.info(
           f"**Ecuación de Regresión Estimada:**  \n"
           f"`Retorno_{ticker_accion}` = **{m:.4f}** × `Retorno_{ticker_mercado}`"
@@ -219,7 +245,6 @@ else:
 
     with tab3:
       st.subheader("Tabla de Datos Históricos Procesados")
-      # Se eliminó la columna de tendencia anterior y se muestran las series limpias
       df_display = df[["Accion", "Mercado", "Ret_Accion", "Ret_Mercado"]].copy()
       df_display.columns = [
           f"Precio {ticker_accion}",
@@ -237,8 +262,7 @@ else:
 
       st.latex(r"E(R_i) = R_f + \beta_i \times [E(R_m) - R_f]")
 
-      # Desglose en tabla o métricas explicativas
-      st.markdown("### Componentes del Modelo:")
+      st.markdown("### Componentes del Modelo (Anualizados):")
       col_c1, col_c2 = st.columns(2)
 
       with col_c1:
@@ -247,7 +271,7 @@ else:
             value=f"{tasa_libre_riesgo:.2%}",
         )
         st.metric(
-            label=f"Retorno Esperado del Mercado $E(R_m)$ ({ticker_mercado})",
+            label=f"Retorno Esperado Anual del Mercado $E(R_m)$ ({ticker_mercado})",
             value=f"{ret_esp_mercado_anual:.2%}",
         )
         prima_mercado = ret_esp_mercado_anual - tasa_libre_riesgo
