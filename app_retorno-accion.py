@@ -261,7 +261,7 @@ else:
       st.latex(r"\sigma_{anual} = \sigma_{diaria} \times \sqrt{252}")
 
       st.markdown("---")
-      st.markdown("### 4. Coeficiente Beta ($\beta$) del Activo")
+      st.markdown("### 4. Coeficiente Beta (β) del Activo")
       st.markdown(
           "Mide el riesgo sistemático o sensibilidad del activo frente al"
           " mercado, calculado como la covarianza entre los retornos del activo"
@@ -303,10 +303,10 @@ else:
         )
 
       with col_c2:
-        st.metric(label=f"Coeficiente Beta ($\beta_i$)", value=f"{beta:.2f}")
+        st.metric(label=f"Coeficiente Beta (βᵢ)", value=f"{beta:.2f}")
         prima_activo = beta * prima_mercado
         st.metric(
-            label=f"Prima por Riesgo del Activo ($\beta \\times$ Prima)",
+            label=f"Prima por Riesgo del Activo (β × Prima)",
             value=f"{prima_activo:.2%}",
         )
         st.metric(
