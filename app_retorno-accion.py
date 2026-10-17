@@ -50,9 +50,10 @@ tasa_libre_riesgo = (
 @st.cache_data
 def cargar_datos(acc, mkt, inicio, fin):
   try:
-    datos = yf.download([acc, mkt], start=inicio, end=fin, progress=False)[
-        "Close"
-    ]
+    tickers_a_descargar = list(set([acc, mkt]))
+datos = yf.download(
+    tickers_a_descargar, start=inicio, end=fin, progress=False
+)["Close"]
     if isinstance(datos, pd.Series):
       return None, "No se pudieron descargar suficientes datos para los símbolos."
     datos = datos.dropna()
@@ -71,6 +72,15 @@ if error or datos_crudos is None or datos_crudos.empty:
       f"Ocurrió un error al obtener los datos. Verifica los símbolos ingresados ({ticker_accion}, {ticker_mercado}). Detalle: {error}"
   )
 else:
+    ```python
+  if ticker_accion == ticker_mercado:
+    st.warning(
+        f"⚠️ **Atención:** Has seleccionado el mismo símbolo (**{ticker_accion}**)"
+        " tanto para la acción como para el benchmark. Por favor, ingresa un"
+        " activo diferente."
+    )
+  else:
+    # (Todo el resto de tu código que calcula retornos, gráficos y solapas va indentado aquí adentro)
   if (
       ticker_accion in datos_crudos.columns
       and ticker_mercado in datos_crudos.columns
